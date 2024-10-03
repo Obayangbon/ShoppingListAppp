@@ -1,0 +1,31 @@
+# Gradle files
+.gradle/
+build/
+*/build/
+app/build/
+# Local configuration file (local.properties)
+local.properties
+# Android Studio files
+.idea/
+*.iml
+# User-specific configurations
+*.hprof
+# Miscellaneous files
+*.log
+*.tmp
+*.DS_Store
+*.class
+# Generated files
+*.apk
+*.ap_
+# Java class files
+*.class
+# Kotlin build files
+*.kotlin_metadata
+# JUnit test files
+/test-results/
+# Lint results
+/lint-results.xml
+/lint-results-report.xml
+# Firebase config file
+google-services.json
