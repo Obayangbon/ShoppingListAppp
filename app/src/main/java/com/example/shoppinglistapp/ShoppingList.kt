@@ -1,18 +1,26 @@
 package com.example.shoppinglistapp
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -31,6 +39,7 @@ import kotlin.math.sin
 
 /**
  * Data class representing a shopping item with id, name,quantity
+ * Encapsulates the item's properties for easy management and manipulation.
  */
 data class ShoppingItem(
     var id: Int,
@@ -79,9 +88,7 @@ fun ShoppingListApp(modifier :Modifier) {
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(shoppingItems) {
 
-            }
         }
     }
 
@@ -104,7 +111,7 @@ fun ShoppingListApp(modifier :Modifier) {
                     // Input for item quantity. Follow the same structure as the item name field
                     OutlinedTextField(
                         value = itemQuantity,
-                        onValueChange = {itemName = it},
+                        onValueChange = {itemQuantity = it},
                         label = { Text("Quantity")},
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth().padding(8.dp)
@@ -118,6 +125,20 @@ fun ShoppingListApp(modifier :Modifier) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ){
                     Button(onClick = {
+                        if(itemName.isNotEmpty()){
+                            var newItem = ShoppingItem(
+                                id = shoppingItems.size +1,
+                                name = itemName,
+                                quantity = itemQuantity.toInt()
+                            )
+
+                            shoppingItems = shoppingItems + newItem
+                            showDialog = false
+                            itemName = ""
+                            itemQuantity = ""
+                        }
+
+
 
                     }) {
                         Text("Add")
@@ -132,4 +153,6 @@ fun ShoppingListApp(modifier :Modifier) {
 
     }
 }
+
+
 
