@@ -88,7 +88,10 @@ fun ShoppingListApp(modifier :Modifier) {
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            items(shoppingItems) {
+                ShoppingListItem(it, {}, {})
 
+            }
         }
     }
 
@@ -154,5 +157,42 @@ fun ShoppingListApp(modifier :Modifier) {
     }
 }
 
+/**
+ * Composable to display a single shopping item with edit and delete options.
+ * This UI element shows the item's details and allows the user to either edit or delete the item.
+ *
+ * @param item The shopping item to display.
+ * @param onEditClick Action triggered when the edit button is clicked.
+ * @param onDeleteClick Action triggered when the delete button is clicked.
+ */
+@Composable
+fun ShoppingListItem(
+    item :  ShoppingItem,
+    onEditClick : () -> Unit,
+    onDeleteClick : () -> Unit
+){
+    // Row layout for displaying the item, with options for editing and deleting.
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(8.dp)
+            .border(border = BorderStroke(2.dp, Color(0XFF018786)),
+                shape = RoundedCornerShape(20)
+            )
+    ){
+        Text(text = item.name, modifier = Modifier.padding(8.dp))
+        //Spacer(modifier = Modifier.padding(16.dp))
+        Text(text = "Qty: ${item.quantity}", modifier = Modifier.padding(8.dp))
+
+        Row(modifier = Modifier.padding(8.dp)){
+            // Edit button icon triggers the onEditClick lambda when pressed.
+            IconButton(onClick = onEditClick) {
+                Icon(imageVector = Icons.Default.Edit, contentDescription = null)
+            }
+            // Delete button icon triggers the DeleteClick lambda when pressed.
+            IconButton(onClick = onDeleteClick) {
+                Icon(imageVector = Icons.Default.Delete, contentDescription = null)
+            }
+        }
+    }
+}
 
 
