@@ -1,6 +1,7 @@
 package com.example.shoppinglistapp
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,9 +10,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -35,18 +38,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
-import kotlin.math.sin
 
-/**
- * Data class representing a shopping item with id, name,quantity
- * Encapsulates the item's properties for easy management and manipulation.
- */
-data class ShoppingItem(
-    var id: Int,
-    var name: String,
-    var quantity: Int,
-    var isEditing : Boolean = false
-)
+
 
 
 /**
@@ -89,7 +82,26 @@ fun ShoppingListApp(modifier :Modifier) {
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(shoppingItems) {
-                ShoppingListItem(it, {}, {})
+                item ->
+                if(item.isEditing){
+                    ShoppingItemEditor(item = item, onEditComplete = {
+                        editedName, editedQuantity ->
+                        shoppingItems = shoppingItems.map{ it.copy(isEditing = false) }
+                        val editedItem = shoppingItems.find { it.id == item.id }
+                        editedItem?.let {
+                            it.name = editedName
+                            it.quantity = editedQuantity
+                        }
+                    })
+                }else{
+                    ShoppingListItem(item = item,
+                        onEditClick = {
+                        shoppingItems = shoppingItems.map { it.copy(isEditing = it.id == item.id) }
+                    },
+                        onDeleteClick = {
+                        shoppingItems = shoppingItems - item
+                    })
+                }
 
             }
         }
@@ -158,6 +170,53 @@ fun ShoppingListApp(modifier :Modifier) {
 }
 
 /**
+ * Composable for editing a shopping item.
+ * Why: This UI allows the user to modify the name and quantity of a shopping item and save the changes.
+ *
+ * @param item The shopping item to be edited.
+ * @param onEditComplete Callback invoked when editing is complete with the updated name and quantity.
+ */
+@Composable
+fun ShoppingItemEditor(item : ShoppingItem, onEditComplete: (String, Int) -> Unit){
+    var editedName by remember { mutableStateOf(item.name)}
+    var editedQuantity by remember { mutableStateOf(item.quantity.toString()) }
+    var isEditing by remember { mutableStateOf(item.isEditing) }
+
+    Row(modifier = Modifier.fillMaxWidth()
+        .background(Color.White)
+        .padding(8.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ){
+        Column{
+            BasicTextField(
+                value = editedName,
+                onValueChange = {editedName = it},
+                singleLine = true,
+                modifier = Modifier.wrapContentSize().padding(8.dp)
+            )
+            BasicTextField(
+                value = editedQuantity,
+                onValueChange = {editedQuantity = it},
+                singleLine = true,
+                modifier = Modifier.wrapContentSize().padding(8.dp)
+            )
+
+        }
+        Button(onClick = {
+            //End editing mode
+            isEditing = false
+
+            // Calls the onEditComplete callback with the updated name and quantity.
+            // Converts quantity input to an integer; defaults to 1 if input is invalid.
+            onEditComplete(editedName, editedQuantity.toIntOrNull() ?: 1)
+        }) {
+            Text(text = "Save")
+        }
+    }
+
+}
+
+/**
  * Composable to display a single shopping item with edit and delete options.
  * This UI element shows the item's details and allows the user to either edit or delete the item.
  *
@@ -166,17 +225,14 @@ fun ShoppingListApp(modifier :Modifier) {
  * @param onDeleteClick Action triggered when the delete button is clicked.
  */
 @Composable
-fun ShoppingListItem(
-    item :  ShoppingItem,
-    onEditClick : () -> Unit,
-    onDeleteClick : () -> Unit
-){
+fun ShoppingListItem(item :  ShoppingItem, onEditClick : () -> Unit, onDeleteClick : () -> Unit){
     // Row layout for displaying the item, with options for editing and deleting.
     Row(
         modifier = Modifier.fillMaxWidth().padding(8.dp)
             .border(border = BorderStroke(2.dp, Color(0XFF018786)),
                 shape = RoundedCornerShape(20)
-            )
+            ),
+        horizontalArrangement = Arrangement.SpaceBetween
     ){
         Text(text = item.name, modifier = Modifier.padding(8.dp))
         //Spacer(modifier = Modifier.padding(16.dp))
